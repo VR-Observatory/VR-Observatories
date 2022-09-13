@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: dc2be083d0b9d6e4f87e92f09b6d83ff
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: No Surrender
+  fontNames:
+  - No Surrender
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 09964aaad810648459aea0c50ab2b18d, type: 3}
+  - {fileID: 12800000, guid: b4f5816cbd002b34d8f4c9954b9a5646, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,153 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &3162974672409363276
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 359476904, guid: dbad3890279801a47aad729db45a8ca3, type: 3}
+      propertyPath: user
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 359476904, guid: dbad3890279801a47aad729db45a8ca3, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 359476904, guid: dbad3890279801a47aad729db45a8ca3, type: 3}
+      propertyPath: transition
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 359476904, guid: dbad3890279801a47aad729db45a8ca3, type: 3}
+      propertyPath: CurrentLight
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 868617063, guid: dbad3890279801a47aad729db45a8ca3, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1182563006, guid: dbad3890279801a47aad729db45a8ca3, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1363136074, guid: dbad3890279801a47aad729db45a8ca3, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1586601280, guid: dbad3890279801a47aad729db45a8ca3, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731149, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_Name
+      value: signport00
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731377, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731377, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.64
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731377, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -9.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731377, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 60.58
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731377, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731377, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731377, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731377, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731377, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731377, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842473328731377, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842474580140234, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: eventsys
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842474580140234, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: Crosshairs
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842474580140234, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: currentLight
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842474580140234, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: teleport_notice
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842474580140234, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: teleportlights.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959842474580140234, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: teleportlights.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5654233671101940123, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: user
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5654233671101940123, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5654233671101940123, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: transition
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5654233671101940123, guid: dbad3890279801a47aad729db45a8ca3,
+        type: 3}
+      propertyPath: CurrentLight
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dbad3890279801a47aad729db45a8ca3, type: 3}
