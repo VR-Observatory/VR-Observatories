@@ -62,6 +62,5 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
-# Blender files
-*.blend
+# Blender backup files
 *.blend1
