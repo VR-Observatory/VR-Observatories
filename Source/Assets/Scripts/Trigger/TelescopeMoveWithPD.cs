@@ -10,7 +10,6 @@ public class TelescopeMoveWithPD : MonoBehaviour
     public float sliderThreshold = 0.5f;
 
     public GameObject playerController; // needed to get input mode
-    public AudioSource telescopeInteractionAudio;
     
     [Header("Settings")]
     [SerializeField]
@@ -60,7 +59,6 @@ public class TelescopeMoveWithPD : MonoBehaviour
                 player = GameObject.Find("PCPlayerController");
                 break;
         }
-        AudioMaster.InitAudioSource(telescopeInteractionAudio, 2f);
     }
 
     // Update is called once per frame
@@ -70,8 +68,6 @@ public class TelescopeMoveWithPD : MonoBehaviour
             MobileMove();
         else
             Move();
-        // early stop the telescope interaction audio
-        AudioMaster.EarlyStop(telescopeInteractionAudio, 0.5f);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -103,15 +99,11 @@ public class TelescopeMoveWithPD : MonoBehaviour
                 buildingShell.transform.RotateAround(buildingShell.transform.position,Vector3.up,Time.deltaTime * bRotationSpeed);
                 // defaultAngle += Time.deltaTime * rotationSpeed;
                 player.gameObject.transform.RotateAround(buildingShell.transform.position,Vector3.up,Time.deltaTime * bRotationSpeed);
-                // play telescope interaction audio
-                AudioMaster.PlayAudio(telescopeInteractionAudio);
             }
             else if (Input.GetButton("Telescope Mid Rotate Neg")) {
                 buildingShell.transform.RotateAround(buildingShell.transform.position,Vector3.down,Time.deltaTime * bRotationSpeed);
                 // defaultAngle += Time.deltaTime * rotationSpeed;
                 player.gameObject.transform.RotateAround(buildingShell.transform.position,Vector3.down,Time.deltaTime * bRotationSpeed);
-                // play telescope interaction audio
-                AudioMaster.PlayAudio(telescopeInteractionAudio);
             }
 
             // Button for rotating the telescope
@@ -119,15 +111,11 @@ public class TelescopeMoveWithPD : MonoBehaviour
             {
                 telescope.transform.Rotate(Vector3.left * Time.deltaTime * tRotationSpeed);
                 defaultAngle += Time.deltaTime * tRotationSpeed;
-                // play telescope interaction audio
-                AudioMaster.PlayAudio(telescopeInteractionAudio);
             }
             else if (Input.GetButton("Telescope Top Rotate Neg") && defaultAngle >= minimumAngle)
             {
                 telescope.transform.Rotate(Vector3.right * Time.deltaTime * tRotationSpeed);
                 defaultAngle -= Time.deltaTime * tRotationSpeed;
-                // play telescope interaction audio
-                AudioMaster.PlayAudio(telescopeInteractionAudio);
             }
         }
     }
@@ -143,8 +131,6 @@ public class TelescopeMoveWithPD : MonoBehaviour
                     Time.deltaTime * bRotationSpeed);
                 player.gameObject.transform.RotateAround(buildingShell.transform.position, Vector3.up,
                     Time.deltaTime * bRotationSpeed);
-                // play telescope interaction audio
-                AudioMaster.PlayAudio(telescopeInteractionAudio);
             }
             else if (telescopeSlider1.Horizontal < -sliderThreshold)
             {
@@ -153,8 +139,6 @@ public class TelescopeMoveWithPD : MonoBehaviour
                 // defaultAngle += Time.deltaTime * rotationSpeed;
                 player.gameObject.transform.RotateAround(buildingShell.transform.position, Vector3.down,
                     Time.deltaTime * bRotationSpeed);
-                // play telescope interaction audio
-                AudioMaster.PlayAudio(telescopeInteractionAudio);
             }
 
             // Button for rotating the telescope
@@ -162,15 +146,11 @@ public class TelescopeMoveWithPD : MonoBehaviour
             {
                 telescope.transform.Rotate(Vector3.left * Time.deltaTime * tRotationSpeed);
                 defaultAngle += Time.deltaTime * tRotationSpeed;
-                // play telescope interaction audio
-                AudioMaster.PlayAudio(telescopeInteractionAudio);
             }
             else if (telescopeSlider2.Horizontal < -sliderThreshold && defaultAngle >= minimumAngle)
             {
                 telescope.transform.Rotate(Vector3.right * Time.deltaTime * tRotationSpeed);
                 defaultAngle -= Time.deltaTime * tRotationSpeed;
-                // play telescope interaction audio
-                AudioMaster.PlayAudio(telescopeInteractionAudio);
             }
         }
     }

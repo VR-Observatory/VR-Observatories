@@ -1,143 +1,355 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-public static class AudioMaster
+public class AudioMaster : MonoBehaviour
 {
-    public static void Instantiate()
-    {
-        _audioMinInterval = new Dictionary<AudioSource, float>();
-        _audioTimerMap = new Dictionary<AudioSource, float>();
-        _earlyStopTimerMap = new Dictionary<AudioSource, float>();
-        _maxStopTimerMap = new Dictionary<AudioSource, float>();
+    // access the audio master via the singleton instance
+    private static AudioMaster Instance { get; set; }
+    private void Awake() 
+    { 
+        if (Instance != null && Instance != this) 
+        { 
+            Destroy(this); 
+        } 
+        else 
+        { 
+            Instance = this; 
+        } 
     }
 
-    // audioType is the name for each audio
-    public enum AudioType
+    public enum AudioAction
     {
-        // add additional audio type here
-        TelescopeInteractionAudio
+        None,
+        Play,
+        PlayOneShot,
+        Pause,
+        Stop
     }
 
-    private static Dictionary<AudioSource, float> _audioMinInterval;
-    private static Dictionary<AudioSource, float> _audioTimerMap;
-    private static Dictionary<AudioSource, float> _earlyStopTimerMap;
-    private static Dictionary<AudioSource, float> _maxStopTimerMap;
-    
-    /// <summary>
-    /// Given an audio source and the minimum replay time, record the relevant statistics.
-    /// </summary>
-    /// <param name="audioSource">The audio source to be initialized</param>
-    /// <param name="minInterval">The minimum replay time interval</param>
-    public static void InitAudioSource(AudioSource audioSource, float minInterval)
+    public enum EventType
     {
-        _earlyStopTimerMap[audioSource] = 0f;
-        _maxStopTimerMap[audioSource] = 0f;
-        _audioTimerMap[audioSource] = -minInterval;
-        _audioMinInterval[audioSource] = minInterval;
-        audioSource.playOnAwake = false;
-    }
-
-    /// <summary>
-    /// If an audio is playing, the minimum time interval for the audio to be replayed.
-    /// For example, if an audio is 2 seconds long,
-    /// it is probably the best to wait for at least 2 seconds before the audio can be replayed.
-    /// </summary>
-    /// <param name="audioSource">the audio tuple containing the audio source</param>
-    /// <returns>
-    /// return true if the audio is replayable. 
-    /// </returns>
-    private static bool IsAudioPlayable(AudioSource audioSource)
-    {
-        // get the audio last play time
-        float lastPlayTime = _audioTimerMap[audioSource];
-        // audio is playable if the time interval has expired
-        if (lastPlayTime + _audioMinInterval[audioSource] < Time.time)
-        {
-            // register the latest play time
-            _audioTimerMap[audioSource] = Time.time;
-            return true;
-        }
-        // otherwise the audio is not playable
-        return false;
-    }
-
-    private static void ResetEarlyStopTimer(AudioSource audioSource)
-    {
-        _earlyStopTimerMap[audioSource] = 0f;
+        None, // for the audio without a game object
+        OnTransform, // if the game object is transforming.
+        OnTransformStart, // then the game object starts transforming
+        OnTransformStop, // if the game object stops transforming.
+        OnTriggerEnter, // if the player enters the collision area.
+        OnTriggerExit, // if the player exits the collision area.
+        OnTriggerStay // if the player stays in the collision area.
     }
     
-    /// <summary>
-    /// Early stop the audio given an audio source and a delay interval,
-    /// for example, if the player stops walking, after 0.1 seconds delay,
-    /// stop the audio.
-    /// </summary>
-    /// <param name="audioSource">The audio source to be early stopped.</param>
-    /// <param name="delayStopInterval">The delayed time interval for stopping the audio after an event.</param>
-    public static void EarlyStop(AudioSource audioSource, float delayStopInterval)
+    [Serializable]
+    public class AudioEvent : AudioEventObject { }
+
+    [Serializable]
+    public class AudioEventObject
     {
-        if (!audioSource.isPlaying)
-        {
-            ResetEarlyStopTimer(audioSource);
-            return;
-        }
-        _earlyStopTimerMap[audioSource] += Time.deltaTime;
-        if (_earlyStopTimerMap[audioSource] >= delayStopInterval)
-        {
-            audioSource.Stop();
-        }
-    }
-    
-    private static void ResetMaxStopTimer(AudioSource audioSource)
-    {
-        _maxStopTimerMap[audioSource] = 0f;
+        public AudioClip audioClip; // the audio clip to be referenced if the type of the event is triggered
+        public EventType eventType; // the event type, see the EventType enumeration
+        public AudioAction audioAction; // the action for the audio clip, such as play, pause or stop if the event is triggered 
     }
 
-    /// <summary>
-    /// Stop an audio upon reaching the maximum time interval.
-    /// </summary>
-    /// <param name="audioSource">the audio source</param>
-    /// <param name="maxStopInterval">the maximum time interval</param>
-    /// <remarks>
-    /// The moment the audio source starts playing, the max stop timer starts,
-    /// once the maximum stop interval is reached, stop the audio.
-    /// </remarks>
-    public static void MaxStop(AudioSource audioSource, float maxStopInterval)
+    [Serializable]
+    public class AudioGameObject
     {
-        if (!audioSource.isPlaying)
+        public GameObject audioLocation; // the game object with the audio source
+        public AudioSource soundSetting;
+            
+        private AudioSource _audioSource;
+        private Collider _collider;
+        private bool _isPlayerIn; // is the player in the collider (assume the player is out)
+        private bool _isTransforming; // if the game object is in the process of transforming
+        
+        public void Instantiate(Sound sound)
         {
-            ResetMaxStopTimer(audioSource);
-            return;
-        }
-        _maxStopTimerMap[audioSource] += Time.deltaTime;
-        if (_maxStopTimerMap[audioSource] >= maxStopInterval)
-        {
-            audioSource.Stop();
-        }
-    }
-
-    /// <summary>
-    /// Play an audio given an audio source,
-    /// this method automatically resets the early stop time.
-    /// </summary>
-    /// <param name="audioSource">The audio source.</param>
-    /// <remarks>
-    /// This method automatically resets the early stop time, 
-    /// for example, if the player is walking, the method is called every frame the player presses the forward button,
-    /// which resets the early stop timer. The moment the player stops pressing the forward button,
-    /// the method stops being called, the audio will still play, the early stop counter will start.
-    /// </remarks>
-    public static void PlayAudio(AudioSource audioSource)
-    {
-        ResetEarlyStopTimer(audioSource);
-        // if the audio source is not playing (idle) or if the minimum replay time has expired.
-        if (!audioSource.isPlaying || IsAudioPlayable(audioSource))
-        {
-            if (audioSource.clip == null)
+            // assign the audio location to a game object if the audio location is null
+            if (audioLocation.Equals(null)) audioLocation = new GameObject("AudioLocationGameObject");
+            _collider = audioLocation.GetComponent<Collider>().Equals(null) ? null : audioLocation.GetComponent<Collider>();
+            if (sound.hasSingularSetting)
             {
-                throw new ArgumentException("Invalid audio source with no audio clip!");
+                soundSetting = sound.soundSetting;
             }
-            audioSource.PlayOneShot(audioSource.clip);
+            if (sound.hasSingularSource)
+            {
+                // assume singular source if the parameter is not null 
+                _audioSource = sound.GetAudioSource();
+                _audioSource.spatialBlend = sound.singularLocation.name == "SingularSound" ? 0f : 1.0f;
+            }
+            else
+            {
+                if (soundSetting != null)
+                {
+                    _audioSource = UnityEngine.Object.Instantiate(soundSetting, audioLocation.transform, false);
+                }
+                else
+                {
+                    // the audio source is on audio game object if the parameter is null
+                    _audioSource = audioLocation.AddComponent<AudioSource>();
+                    _audioSource.spatialBlend = audioLocation.name == "AudioLocationGameObject" ? 0f : 1.0f;
+                }
+            }
+            audioLocation.transform.hasChanged = false;
+        }
+        
+        public AudioSource GetAudioSource()
+        {
+            return _audioSource;
+        }
+        
+        public Collider GetCollider()
+        {
+            return _collider;
+        }
+
+        public bool IsPlayerIn()
+        {
+            return _isPlayerIn;
+        }
+
+        public void SetPlayerIn(bool isPlayerIn)
+        {
+            _isPlayerIn = isPlayerIn;
+        }
+
+        public bool IsTransforming()
+        {
+            return _isTransforming;
+        }
+
+        public void SetTransforming(bool isTransforming)
+        {
+            _isTransforming = isTransforming;
+        }
+    }
+    
+    [Serializable]
+    public class Controller
+    {
+        public AudioGameObject[] audioGameObjects;
+        public AudioEvent[] audioEvents;
+
+        public void Instantiate(Sound sound)
+        {
+            foreach (var audioGameObject in audioGameObjects)
+            {
+                audioGameObject.Instantiate(sound);
+            }
+        }
+    }
+
+    [Serializable]
+    public class AudioController : Controller { }
+
+    public GameObject playerController;
+    public Sound[] sounds;
+    private static GameObject _player;
+
+    [Serializable]
+    public class Sound
+    {
+        public string name; // the name of the sound group, for keeping track of everything
+        public bool hasSingularSource; // all audio controllers will have a singular audio source if this is true
+        public GameObject singularLocation;
+        public bool hasSingularSetting;
+        public AudioSource soundSetting;
+        public AudioController[] audioControllers;
+        
+        private AudioSource _audioSource;
+        
+        public void Instantiate()
+        {
+            if (hasSingularSource)
+            {
+                if (singularLocation.Equals(null))
+                {
+                    singularLocation = new GameObject("SingularSound"); 
+                    if (soundSetting != null)
+                    {
+                        _audioSource = UnityEngine.Object.Instantiate(soundSetting, singularLocation.transform, false);
+                    }
+                    else
+                    {
+                        _audioSource = singularLocation.AddComponent<AudioSource>();
+                        _audioSource.spatialBlend = 0f;
+                    }
+                }
+                else
+                {
+                    if (soundSetting != null)
+                    {
+                        _audioSource = UnityEngine.Object.Instantiate(soundSetting, singularLocation.transform, false);
+                    }
+                    else
+                    {
+                        _audioSource = singularLocation.AddComponent<AudioSource>();
+                        _audioSource.spatialBlend = 1.0f;
+                    }
+                }
+                singularLocation.transform.hasChanged = false;
+            }
+        }
+
+        public AudioSource GetAudioSource()
+        {
+            return _audioSource;
+        }
+    }
+
+    private void Start()
+    {
+        PlayerControlManager manager = playerController.GetComponent<PlayerControlManager>();
+        switch (manager.controlMode)
+        {
+            case PlayerControlManager.controlModes.PC:
+                _player = manager.pcPlayerController.transform.GetChild(1).gameObject;
+                break;
+            case PlayerControlManager.controlModes.OVR:
+                _player = manager.ovrPlayerController.transform.GetChild(0).gameObject;
+                break;
+            case PlayerControlManager.controlModes.AndroidMobile:
+                _player = manager.androidMobilePlayerController.transform.GetChild(0).gameObject;
+                break;
+            case PlayerControlManager.controlModes.Auto:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        
+        foreach (var sound in sounds)
+        {
+            sound.Instantiate();
+            foreach (var audioController in sound.audioControllers)
+            {
+                audioController.Instantiate(sound);
+            }
+        }
+    }
+
+    private void Update()
+    {
+        // iterate over the sound
+        foreach (var sound in sounds)
+        {
+            foreach (var audioController in sound.audioControllers) 
+            {
+                foreach (var audioGameObject in audioController.audioGameObjects)
+                {
+                    foreach (var audioEvent in audioController.audioEvents)
+                    {
+                        var triggerEvent = false;
+                        switch (audioEvent.eventType)
+                        {
+                            case EventType.None:
+                                break;
+                            case EventType.OnTransform:
+                                if (audioGameObject.audioLocation.transform.hasChanged)
+                                {
+                                    triggerEvent = true;
+                                }
+                                break;
+                            case EventType.OnTransformStart:
+                                if (audioGameObject.audioLocation.transform.hasChanged)
+                                {
+                                    if (!audioGameObject.IsTransforming())
+                                    {
+                                        audioGameObject.SetTransforming(true);
+                                        triggerEvent = true;
+                                    }
+                                }
+                                else
+                                {
+                                    audioGameObject.SetTransforming(false);
+                                }
+                                break;
+                            case EventType.OnTransformStop:
+                                if (!audioGameObject.audioLocation.transform.hasChanged)
+                                {
+                                    triggerEvent = true;
+                                }
+                                break;
+                            case EventType.OnTriggerEnter:
+                                // trigger the event only if the player is out (on the last frame)
+                                if (!audioGameObject.IsPlayerIn())
+                                {
+                                    // if enter then trigger the audio event
+                                    if (audioGameObject.GetCollider().bounds.Contains(_player.transform.position))
+                                    {
+                                        triggerEvent = true;
+                                        audioGameObject.SetPlayerIn(true);
+                                    }
+                                }
+                                break;
+                            case EventType.OnTriggerExit:
+                                // trigger the event only if the player is in (on the last frame)
+                                if (audioGameObject.IsPlayerIn())
+                                {
+                                    // if exit then trigger the audio event
+                                    if (!audioGameObject.GetCollider().bounds.Contains(_player.transform.position))
+                                    {
+                                        triggerEvent = true;
+                                        audioGameObject.SetPlayerIn(false);
+                                    }
+                                }
+                                break;
+                            case EventType.OnTriggerStay:
+                                // if  the player is in the trigger area
+                                if (audioGameObject.GetCollider().bounds.Contains(_player.transform.position))
+                                {
+                                    triggerEvent = true;
+                                    audioGameObject.SetPlayerIn(true);
+                                }
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                        
+                        // handle audio event
+                        if (triggerEvent)
+                        {
+                            switch (audioEvent.audioAction)
+                            {
+                                case AudioAction.None:
+                                    break;
+                                case AudioAction.Play:
+                                    if (!audioGameObject.GetAudioSource().isPlaying)
+                                    {
+                                        audioGameObject.GetAudioSource().clip = audioEvent.audioClip;
+                                        audioGameObject.GetAudioSource().Play();
+                                    }
+                                    break;
+                                case AudioAction.PlayOneShot:
+                                    if (!audioGameObject.GetAudioSource().isPlaying)
+                                    {
+                                        audioGameObject.GetAudioSource().PlayOneShot(audioEvent.audioClip);
+                                    }
+                                    break;
+                                case AudioAction.Pause:
+                                    audioGameObject.GetAudioSource().Pause();
+                                    break;
+                                case AudioAction.Stop:
+                                    audioGameObject.GetAudioSource().Stop();
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // reset transform status to false
+        foreach (var sound in sounds)
+        {
+            foreach (var audioController in sound.audioControllers)
+            {
+                foreach (var audioGameObject in audioController.audioGameObjects)
+                {
+                    foreach (var unused in audioController.audioEvents)
+                    {
+                        audioGameObject.audioLocation.transform.hasChanged = false;
+                    }
+                }
+            }
         }
     }
 }
