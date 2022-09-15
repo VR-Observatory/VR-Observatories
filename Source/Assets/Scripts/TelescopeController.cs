@@ -18,7 +18,7 @@ public class TelescopeController : MonoBehaviour
     [Header("Midpart Rotation")]
     [SerializeField]
     [Range(-90f, 270f)]
-    private float midpartMinimumAngle;
+    private float midpartMinimumAngle;//Define the maximum and minimum values
     [SerializeField]
     [Range(-90f, 270f)]
     private float midpartMaximumAngle;
