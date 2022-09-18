@@ -10,6 +10,12 @@ public class TelescopeMoveWithPD : MonoBehaviour
     public float sliderThreshold = 0.5f;
 
     public GameObject playerController; // needed to get input mode
+
+    // walking audio setup
+    private Vector3 _lastPlayerPosition;
+    private AudioSource _playerWalkingAudioSource;
+    private AudioClip _playerWalkingAudioClip;
+    private bool _isWalking;
     
     [Header("Settings")]
     [SerializeField]
@@ -59,15 +65,38 @@ public class TelescopeMoveWithPD : MonoBehaviour
                 player = GameObject.Find("PCPlayerController");
                 break;
         }
+
+        _lastPlayerPosition = player.transform.position;
+        _playerWalkingAudioSource = AudioAssistant.GetAudioSource("Default", player);
+        _playerWalkingAudioClip = AudioAssistant.GetAudioClip("walk");
+        _isWalking = false;
     }
 
     // Update is called once per frame
     void Update()
     {
+        // walking
+        if (_lastPlayerPosition.x.Equals(player.transform.position.x) &&
+            _lastPlayerPosition.z.Equals(player.transform.position.z)) 
+        { 
+            // stop player walking audio if the player is not moving horizontally
+            _playerWalkingAudioSource.Stop(); 
+        }
+        else
+        {
+            if (!_playerWalkingAudioSource.isPlaying)
+            {
+                _playerWalkingAudioSource.PlayOneShot(_playerWalkingAudioClip);
+            }
+        } 
+        
         if (playerController.GetComponent<PlayerControlManager>().controlMode.Equals(PlayerControlManager.controlModes.AndroidMobile))
             MobileMove();
         else
             Move();
+        
+        // reset last player position
+        _lastPlayerPosition = player.transform.position;
     }
 
     private void OnTriggerEnter(Collider other)

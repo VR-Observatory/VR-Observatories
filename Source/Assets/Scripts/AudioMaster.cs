@@ -200,13 +200,13 @@ public class AudioMaster : MonoBehaviour
         switch (manager.controlMode)
         {
             case PlayerControlManager.controlModes.PC:
-                _player = manager.pcPlayerController.transform.GetChild(1).gameObject;
+                _player = GameObject.Find("PCPlayerController");
                 break;
             case PlayerControlManager.controlModes.OVR:
-                _player = manager.ovrPlayerController.transform.GetChild(0).gameObject;
+                _player = GameObject.Find("OVRPlayerControllerHands");
                 break;
             case PlayerControlManager.controlModes.AndroidMobile:
-                _player = manager.androidMobilePlayerController.transform.GetChild(0).gameObject;
+                _player = GameObject.Find("AndroidMobileController");
                 break;
             case PlayerControlManager.controlModes.Auto:
                 break;
@@ -243,6 +243,7 @@ public class AudioMaster : MonoBehaviour
                             case EventType.OnTransform:
                                 if (audioGameObject.audioLocation.transform.hasChanged)
                                 {
+                                    audioGameObject.SetTransforming(true);
                                     triggerEvent = true;
                                 }
                                 break;
@@ -263,7 +264,11 @@ public class AudioMaster : MonoBehaviour
                             case EventType.OnTransformStop:
                                 if (!audioGameObject.audioLocation.transform.hasChanged)
                                 {
-                                    triggerEvent = true;
+                                    if (audioGameObject.IsTransforming())
+                                    {
+                                        audioGameObject.SetTransforming(false);
+                                        triggerEvent = true;
+                                    }
                                 }
                                 break;
                             case EventType.OnTriggerEnter:

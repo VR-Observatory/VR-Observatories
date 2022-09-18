@@ -7,12 +7,15 @@ using UnityEngine;
 public class RoofMovementWithPlayerDetection : MonoBehaviour
 {
     public Animator roof;
+    private AudioSource _audioSource;
+    private AudioClip _audioClip;
 
     private bool isIn;
     // Start is called before the first frame update
     void Start()
     {
-        
+        _audioSource = AudioAssistant.GetAudioSource("Linear Source 50", gameObject);
+        _audioClip = AudioAssistant.GetAudioClip("shell");
     }
 
     // Update is called once per frame
@@ -48,6 +51,10 @@ public class RoofMovementWithPlayerDetection : MonoBehaviour
             {
                 roof.SetBool("isOpen",!roof.GetBool("isOpen"));
                 print("open roof");
+                if (!_audioSource.isPlaying)
+                {
+                    _audioSource.PlayOneShot(_audioClip);
+                }
             }
         }
     }
